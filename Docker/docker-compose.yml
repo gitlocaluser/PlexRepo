@@ -1,0 +1,83 @@
+---
+version: "3.8"
+
+services:
+  overseerr:
+    image: sctx/overseerr:latest
+    container_name: overseerr
+    environment:
+      - 'PUID=${PUID}'
+      - 'PGID=${PGID}'
+      - 'LOG_LEVEL=${LOGLEVEL}'
+      - 'TZ=${TZ}'
+    volumes:
+      - '${ROOT}\Overseerr:/app/config'
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+
+  tautulli:
+    image: ghcr.io/tautulli/tautulli:nightly
+    container_name: tautulli
+    restart: unless-stopped
+    environment:
+        - 'PUID=${PUID}'
+        - 'PGID=${PGID}'
+        - 'LOG_LEVEL=${LOGLEVEL}'
+        - 'TZ=${TZ}'
+    volumes:
+        - '${ROOT}\tautulli:/config'
+    ports:
+        - '8181:8181'
+    labels:
+        - 'name="Tautulli"'
+        - 'description="Tautulli Plex Monitoring"'
+        - 'department="Media"'
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:nightly
+    container_name: prowlarr
+    restart: unless-stopped
+    environment:
+        - 'PUID=${PUID}'
+        - 'PGID=${PGID}'
+        - 'LOG_LEVEL=${LOGLEVEL}'
+        - 'TZ=${TZ}'
+    ports:
+      - 9696:9696
+    volumes:
+      - '${ROOT}\prowlarr:/config'
+    labels:
+    - 'name="Prowlarr"'
+    - 'description="Indexers"'
+    - 'department="Media"'
+
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    environment:
+        - 'PUID=${PUID}'
+        - 'PGID=${PGID}'
+        - 'LOG_LEVEL=${LOGLEVEL}'
+        - 'TZ=${TZ}'
+    ports:
+      - 7575:7575
+    volumes:
+      - '${ROOT}\homarr\configs:/app/data/configs'
+      - '${ROOT}\homarr\icons:/app/public/icons'
+
+  wizarr:
+    container_name: wizarr
+    image: ghcr.io/wizarrrr/wizarr
+    environment:
+      - APP_URL=https://invite.yourplexrequest.com #URL at which you will access and share 
+      - DISABLE_BUILTIN_AUTH=false #Set to true ONLY if you are using another auth provider (Authelia, Authentik, etc)
+      - 'PUID=${PUID}'
+      - 'PGID=${PGID}'
+      - 'LOG_LEVEL=${LOGLEVEL}'
+      - 'TZ=${TZ}'
+    ports:
+      - 5690:5690
+    volumes:
+      - '${ROOT}\wizarr:/data/database'
