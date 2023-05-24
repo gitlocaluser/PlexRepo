@@ -5,3 +5,7 @@ docker-compose up -d
 docker-compose down
 docker-compose pull
 ```
+
+powershell```
+get-content
+```
