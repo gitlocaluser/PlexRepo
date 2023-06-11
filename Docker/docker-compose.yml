@@ -1,3 +1,5 @@
+# 
+
 ---
 version: "3.8"
 
@@ -6,10 +8,10 @@ services:
     image: sctx/overseerr:latest
     container_name: overseerr
     environment:
-      - 'PUID=${PUID}'
-      - 'PGID=${PGID}'
-      - 'LOG_LEVEL=${LOGLEVEL}'
-      - 'TZ=${TZ}'
+      - "PUID=${PUID}"
+      - "PGID=${PGID}"
+      - "LOG_LEVEL=${LOGLEVEL}"
+      - "TZ=${TZ}"
     volumes:
       - '${ROOT}\Overseerr:/app/config'
     ports:
@@ -21,46 +23,46 @@ services:
     container_name: tautulli
     restart: unless-stopped
     environment:
-        - 'PUID=${PUID}'
-        - 'PGID=${PGID}'
-        - 'LOG_LEVEL=${LOGLEVEL}'
-        - 'TZ=${TZ}'
+      - "PUID=${PUID}"
+      - "PGID=${PGID}"
+      - "LOG_LEVEL=${LOGLEVEL}"
+      - "TZ=${TZ}"
     volumes:
-        - '${ROOT}\tautulli:/config'
+      - '${ROOT}\tautulli:/config'
     ports:
-        - '8181:8181'
+      - "8181:8181"
     labels:
-        - 'name="Tautulli"'
-        - 'description="Tautulli Plex Monitoring"'
-        - 'department="Media"'
+      - 'name="Tautulli"'
+      - 'description="Tautulli Plex Monitoring"'
+      - 'department="Media"'
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:nightly
     container_name: prowlarr
     restart: unless-stopped
     environment:
-        - 'PUID=${PUID}'
-        - 'PGID=${PGID}'
-        - 'LOG_LEVEL=${LOGLEVEL}'
-        - 'TZ=${TZ}'
+      - "PUID=${PUID}"
+      - "PGID=${PGID}"
+      - "LOG_LEVEL=${LOGLEVEL}"
+      - "TZ=${TZ}"
     ports:
       - 9696:9696
     volumes:
       - '${ROOT}\prowlarr:/config'
     labels:
-    - 'name="Prowlarr"'
-    - 'description="Indexers"'
-    - 'department="Media"'
+      - 'name="Prowlarr"'
+      - 'description="Indexers"'
+      - 'department="Media"'
 
   homarr:
     image: ghcr.io/ajnart/homarr:latest
     container_name: homarr
     restart: unless-stopped
     environment:
-        - 'PUID=${PUID}'
-        - 'PGID=${PGID}'
-        - 'LOG_LEVEL=${LOGLEVEL}'
-        - 'TZ=${TZ}'
+      - "PUID=${PUID}"
+      - "PGID=${PGID}"
+      - "LOG_LEVEL=${LOGLEVEL}"
+      - "TZ=${TZ}"
     ports:
       - 7575:7575
     volumes:
@@ -70,14 +72,94 @@ services:
   wizarr:
     container_name: wizarr
     image: ghcr.io/wizarrrr/wizarr
+    restart: unless-stopped
     environment:
-      - APP_URL=https://invite.${SERVER}.com #URL at which you will access and share 
+      - APP_URL='https://${SERVER}' #URL at which you will access and share
       - DISABLE_BUILTIN_AUTH=false #Set to true ONLY if you are using another auth provider (Authelia, Authentik, etc)
-      - 'PUID=${PUID}'
-      - 'PGID=${PGID}'
-      - 'LOG_LEVEL=${LOGLEVEL}'
-      - 'TZ=${TZ}'
+      - "PUID=${PUID}"
+      - "PGID=${PGID}"
+      - "LOG_LEVEL=${LOGLEVEL}"
+      - "TZ=${TZ}"
     ports:
       - 5690:5690
     volumes:
       - '${ROOT}\wizarr:/data/database'
+
+  dashdot:
+    container_name: dashdot
+    image: mauricenino/dashdot:latest
+    restart: unless-stopped
+    privileged: true
+    ports:
+    - '3001:3001'
+    volumes:
+    - '${ROOT}\dashdot:/config'
+
+  #sabnzbd:
+    #image: lscr.io/linuxserver/sabnzbd:latest
+    #container_name: sabnzbd
+   ## environment:
+   #   - "PUID=${PUID}"
+    #  - "PGID=${PGID}"
+     # - "LOG_LEVEL=${LOGLEVEL}"
+     # - "TZ=${TZ}"
+   # volumes:
+    #  - '${ROOT}\sabnzbd:/config'
+     # - '${R}\complete:/downloads' #optional
+     # - '${R}\incomplete:/incomplete-downloads' #optional
+   # ports:
+    #  - 8080:8080
+   # restart: unless-stopped
+
+    #radarr:
+    #image: lscr.io/linuxserver/radarr:latest
+    #container_name: radarr
+   # restart: unless-stopped
+   # environment:
+  #    - "PUID=${PUID}"
+  #    - "PGID=${PGID}"
+  #    - "LOG_LEVEL=${LOGLEVEL}"
+  #    - "TZ=${TZ}"
+   # volumes:
+   #   - '${ROOT}\radarr:/config'
+   #   - '${R}\complete:/downloads'
+   #   - E:\:/movies
+    #ports:
+    #  - 7878:7878
+  
+  #sonarr:
+    #image: lscr.io/linuxserver/sonarr:latest
+    #container_name: sonarr
+    #restart: unless-stopped
+    #environment:
+    #  - "PUID=${PUID}"
+    #  - "PGID=${PGID}"
+    #  - "LOG_LEVEL=${LOGLEVEL}"
+    #  - "TZ=${TZ}"
+    #volumes:
+     # - '${ROOT}\sonarr:/config'
+     # - '${R}\complete:/downloads'
+     # - D:\:/tv
+    #ports:
+     # - 8991:8989
+
+  # sonarr4K:
+  #  image: lscr.io/linuxserver/sonarr:latest
+  #  container_name: sonarr4k
+  #  restart: unless-stopped
+  #  environment:
+  #    - "PUID=${PUID}"
+   #   - "PGID=${PGID}"
+    #  - "LOG_LEVEL=${LOGLEVEL}"
+     # - "TZ=${TZ}"
+    #volumes:
+    #  - '${ROOT}\sonarr4k:/config'
+    #  - D:\:/tv
+    #ports:
+    #  - 8990:8989
+
+
+# Set External internet access to Full API
+# Speacial > host_whitelist > add comma to existing, then your sub.domain.com
+# Check folders manually
+# After adding a category, press Save
