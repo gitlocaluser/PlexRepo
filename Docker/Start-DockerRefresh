@@ -1,4 +1,4 @@
-function Recreate-DockerComposeServices
+function Start-DockerRefresh
 {
     <#
     .SYNOPSIS
@@ -96,4 +96,4 @@ function Recreate-DockerComposeServices
 
 
 
-Recreate-DockerComposeServices
+Start-DockerRefresh
