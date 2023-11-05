@@ -1,0 +1,99 @@
+function Recreate-DockerComposeServices
+{
+    <#
+    .SYNOPSIS
+    Destroys and recreates Docker services using docker-compose to ensure they are up-to-date.
+    .PARAMETER ComposePath
+    Path to the directory containing docker-compose.yml.
+    #>
+    [CmdletBinding()]
+    param (
+        [string]$ComposePath = 'Y:\Docker'
+    )
+
+    # Check if Docker is running
+    try
+    {
+        docker info > $null 2>&1
+    }
+    catch
+    {
+        Write-Host 'Docker is not running. Exiting.'
+        return
+    }
+
+    # Store the current location
+    $currentLocation = Get-Location
+
+    # Change directory to where the docker-compose.yml file is located
+    Set-Location $ComposePath
+
+    # Array of Docker service names as defined in docker-compose.yml
+    $dockerServices = @(
+        'overseerr',
+        'homarr',
+        'tautulli',
+        'wizarr'
+    )
+
+    # Initialize an array to keep track of successfully processed services for rollback
+    $successfulServices = @()
+
+    # Show initial container states
+    Write-Host 'Initial container states:'
+    docker ps -a
+
+    $totalServices = $dockerServices.Count
+    $currentService = 0
+
+    foreach ($service in $dockerServices)
+    {
+        $currentService++
+        try
+        {
+            # Stop the service
+            docker-compose stop $service
+
+            # Remove the service container
+            docker-compose rm -f $service
+
+            # Pull the latest image for the service
+            docker-compose pull $service
+
+            # Recreate and start the service container
+            docker-compose up -d $service
+
+            # Add service to successfulServices array for rollback mechanism
+            $successfulServices += $service
+        }
+        catch
+        {
+            Write-Host "Error with service: $service"
+            Write-Host $_.Exception.Message
+            # Rollback the successfully processed services
+            foreach ($successfulService in $successfulServices)
+            {
+                docker-compose stop $successfulService
+                docker-compose rm -f $successfulService
+                docker-compose up -d $successfulService
+            }
+
+            $userChoice = Read-Host 'Continue with next service? (Y/N)'
+            if ($userChoice -eq 'N') { break }
+        }
+    }
+
+    # Remove progress bar
+    Write-Progress -Completed
+
+    # Show final container states
+    Write-Host 'Final container states:'
+    docker ps -a
+
+    # Revert back to the original location
+    Set-Location $currentLocation
+}
+
+
+
+Recreate-DockerComposeServices
